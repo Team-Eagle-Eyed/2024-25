@@ -47,7 +47,11 @@ def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 wpi.java.debugJni = false
 
 // Set this to true to enable desktop support.
+<<<<<<< HEAD
 def includeDesktopSupport = true
+=======
+def includeDesktopSupport = false
+>>>>>>> d1bad9fc1289e98f17cb5931fe4c49c2f84960f8
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
