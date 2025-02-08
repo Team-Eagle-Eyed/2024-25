@@ -31,9 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.PositionTracker;
 import frc.robot.Constants;
-import frc.robot.GlobalStates;
 import frc.robot.Constants.Elevator.ElevatorPosition;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -84,13 +82,10 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     private final SysIdRoutine sysIdRoutine;
 
-    private final PositionTracker positionTracker;
-    private final MechanismLigament2d ligament;
-
     @Log
     private boolean initialized;
 
-    public Elevator(PositionTracker positionTracker, MechanismLigament2d ligament) {
+    public Elevator() {
         motorConfig = new SparkMaxConfig();
 
         motorConfig
@@ -116,10 +111,6 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                         },
                         this));
 
-        this.positionTracker = positionTracker;
-        this.ligament = ligament;
-
-        positionTracker.setElevatorPositionSupplier(this::getPosition);
         setDefaultCommand(moveToCurrentGoalCommand());
     }
 
@@ -129,8 +120,6 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         elevatorSim.update(0.020);
         motor.getEncoder().setPosition(elevatorSim.getPositionMeters());
         simVelocity = elevatorSim.getVelocityMetersPerSecond();
-
-        ligament.setLength(getPosition());
     }
 
     public boolean getInitialized() {
@@ -179,14 +168,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         voltage = MathUtil.clamp(voltage, -12, 12);
         voltage = Utils.applySoftStops(voltage, getPosition(), MIN_HEIGHT_METERS, MAX_HEIGHT_METERS);
 
-        if (voltage < 0
-                && positionTracker.getElevatorPosition() < Constants.Elevator.MOTION_LIMIT
-                && positionTracker.getArmAngle() < 0) {
+        if (voltage < 0 && getPosition() < Constants.Elevator.MOTION_LIMIT) {
             voltage = 0;
-        }
-
-        if (!GlobalStates.INITIALIZED.enabled()) {
-            voltage = 0.0;
         }
 
         motor.setVoltage(voltage);
