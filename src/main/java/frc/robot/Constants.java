@@ -8,16 +8,12 @@ public class Constants {
     public static final class Elevator {
         public static enum ElevatorPosition {
             BOTTOM(0.0698),
-            INTAKE_PREP(0.55),
-            INTAKE(0.355),
-            ALGAE_L2(0.884),
-            ALGAE_L3(1.234),
-
+            PROCESSOR(0.1234),
             L1(0.323),
             L2(0.31),
             L3(0.70),
             L4(1.27),
-            TOP(1.57);
+            ALGAE(1.57);
 
             public final double value;
 

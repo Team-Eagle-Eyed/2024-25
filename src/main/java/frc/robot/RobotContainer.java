@@ -15,9 +15,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.robot.Constants.Elevator.ElevatorPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -40,6 +41,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandGenericHID btnbox = new CommandGenericHID(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Intake intake = new Intake();
@@ -68,10 +70,11 @@ public class RobotContainer {
             )
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
+        // While left trigger is held run the weed wackers
+        joystick.leftTrigger().whileTrue(intake.runRollersCommand());
+
+        // When the right trigger is pressed shoot whatever game piece based on elevator height
+        joystick.rightTrigger().onTrue(intake.shootAuto(() -> elevator.getGoal()));
 
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
@@ -89,6 +92,14 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        btnbox.button(0).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM));
+        btnbox.button(1).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR));
+        btnbox.button(2).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1));
+        btnbox.button(3).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2));
+        btnbox.button(4).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3));
+        btnbox.button(5).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4));
+        btnbox.button(6).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

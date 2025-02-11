@@ -14,7 +14,11 @@ import com.techhounds.houndutil.houndlog.annotations.LoggedObject;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Elevator.ElevatorPosition;
+
 import static frc.robot.Constants.Intake.*;
+
+import java.util.function.Supplier;
 
 @LoggedObject
 public class Intake extends SubsystemBase implements BaseIntake {
@@ -74,6 +78,22 @@ public class Intake extends SubsystemBase implements BaseIntake {
                 .withName("intake.shootAlgae");
     }
 
+    public Command shootAuto(Supplier<ElevatorPosition> supp) {
+        var position = supp.get();
+        switch (position) {
+            case ALGAE:
+            case PROCESSOR:
+                return shootAlgae().withTimeout(0.5);
+            case L1:
+            case L2:
+            case L3:
+            case L4:
+                return shootCoral().withTimeout(0.5);
+            default:
+                return Commands.none();
+        }
+    }
+
     private SparkMax createMotor(Boolean inverted, Integer currentLimit, Integer devID) {
         var motorConfig = new SparkMaxConfig();
         motorConfig
@@ -87,7 +107,7 @@ public class Intake extends SubsystemBase implements BaseIntake {
     }
 
     @Override
-    public Command runIntakesCommand() {
+    public Command runRollersCommand() {
         return Commands.startEnd(
                 () -> setIntakeVoltage(3),
                 () -> setIntakeVoltage(0))
@@ -95,7 +115,7 @@ public class Intake extends SubsystemBase implements BaseIntake {
     }
 
     @Override
-    public Command reverseIntakesCommand() {
+    public Command reverseRollersCommand() {
         return Commands.startEnd(
                 () -> setIntakeVoltage(-12),
                 () -> setIntakeVoltage(0))

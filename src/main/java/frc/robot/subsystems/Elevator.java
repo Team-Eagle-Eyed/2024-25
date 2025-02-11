@@ -16,16 +16,12 @@ import com.techhounds.houndutil.houndlog.annotations.LoggedObject;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -53,6 +49,9 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     @Log(groups = "control")
     private final ElevatorFeedforward feedforwardController = new ElevatorFeedforward(kS,
             kG, kV, kA);
+
+    @Log
+    private ElevatorPosition goal;
 
     /**
      * The representation of the "elevator" for simulation. (even though this is a
@@ -126,28 +125,13 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         return initialized;
     }
 
-    @Log(groups = "components")
-    public Pose3d getFrameComponentPose() {
-        return new Pose3d(0.14, 0, 0.13, new Rotation3d());
-    }
-
-    @Log(groups = "components")
-    public Pose3d getStageComponentPose() {
-        Transform3d transform = new Transform3d();
-        if (getPosition() > 0.706) {
-            transform = new Transform3d(0, 0, getPosition() - 0.706, new Rotation3d());
-        }
-        return new Pose3d(0.14, 0, 0.169, new Rotation3d()).plus(transform);
-    }
-
-    @Log(groups = "components")
-    public Pose3d getCarriageComponentPose() {
-        return new Pose3d(0.14, 0, 0.247 + getPosition(), new Rotation3d());
-    }
-
     @Override
     public double getPosition() {
         return motor.getEncoder().getPosition();
+    }
+
+    public ElevatorPosition getGoal() {
+        return goal;
     }
 
     public double getVelocity() {
@@ -188,6 +172,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     @Override
     public Command moveToPositionCommand(Supplier<ElevatorPosition> goalPositionSupplier) {
         return Commands.sequence(
+                runOnce(() -> goal = goalPositionSupplier.get()),
                 runOnce(() -> pidController.reset(getPosition())),
                 runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
                 moveToCurrentGoalCommand()
