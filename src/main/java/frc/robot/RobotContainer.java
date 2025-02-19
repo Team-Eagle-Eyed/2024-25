@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import java.util.List;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -47,7 +48,8 @@ public class RobotContainer {
     private final RobotCentricFacingAngle align = new RobotCentricFacingAngle()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withHeadingPID(0.01, 0, 0) // DO NOT USE
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance); // Using camera
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 

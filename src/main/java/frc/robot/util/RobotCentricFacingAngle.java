@@ -74,6 +74,10 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * For more information, see the documentation of {@link SwerveDriveKinematics#desaturateWheelSpeeds}.
      */
     public boolean DesaturateWheelSpeeds = true;
+    /**
+     * The perspective to use when determining which direction is forward.
+     */
+    public ForwardPerspectiveValue ForwardPerspective = ForwardPerspectiveValue.OperatorPerspective;
 
     /**
      * The PID controller used to maintain the desired heading.
@@ -94,6 +98,10 @@ public class RobotCentricFacingAngle implements SwerveRequest {
 
     public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) {
         Rotation2d angleToFace = TargetDirection;
+        if (ForwardPerspective == ForwardPerspectiveValue.OperatorPerspective) {
+            /* If we're operator perspective, rotate the direction we want to face by the angle */
+            angleToFace = angleToFace.rotateBy(parameters.operatorForwardDirection);
+        }
 
         double toApplyOmega = TargetRateFeedforward +
             HeadingController.calculate(
@@ -343,6 +351,19 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      */
     public RobotCentricFacingAngle withDesaturateWheelSpeeds(boolean newDesaturateWheelSpeeds) {
         this.DesaturateWheelSpeeds = newDesaturateWheelSpeeds;
+        return this;
+    }
+
+    /**
+     * Modifies the ForwardPerspective parameter and returns itself.
+     * <p>
+     * The perspective to use when determining which direction is forward.
+     *
+     * @param newForwardPerspective Parameter to modify
+     * @return this object
+     */
+    public RobotCentricFacingAngle withForwardPerspective(ForwardPerspectiveValue newForwardPerspective) {
+        this.ForwardPerspective = newForwardPerspective;
         return this;
     }
 }
