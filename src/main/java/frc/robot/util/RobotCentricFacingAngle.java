@@ -19,21 +19,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.measure.*;
 
-/**
-     * Drives the swerve drivetrain in a field-centric manner, maintaining a
-     * specified heading angle to ensure the robot is facing the desired direction
-     * <p>
-     * When users use this request, they specify the direction the robot should
-     * travel oriented against the field, and the direction the robot should be facing.
-     * <p>
-     * An example scenario is that the robot is oriented to the east, the VelocityX
-     * is +5 m/s, VelocityY is 0 m/s, and TargetDirection is 180 degrees.
-     * In this scenario, the robot would drive northward at 5 m/s and turn clockwise
-     * to a target of 180 degrees.
-     * <p>
-     * This control request is especially useful for autonomous control, where the
-     * robot should be facing a changing direction throughout the motion.
-     */
 public class RobotCentricFacingAngle implements SwerveRequest {
     /**
      * The velocity in the X direction, in m/s.
@@ -91,11 +76,6 @@ public class RobotCentricFacingAngle implements SwerveRequest {
     public boolean DesaturateWheelSpeeds = true;
 
     /**
-     * The perspective to use when determining which direction is forward.
-     */
-    public ForwardPerspectiveValue ForwardPerspective = ForwardPerspectiveValue.OperatorPerspective;
-
-    /**
      * The PID controller used to maintain the desired heading.
      * Users can specify the PID gains to change how aggressively to maintain
      * heading.
@@ -106,18 +86,14 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      */
     public PhoenixPIDController HeadingController = new PhoenixPIDController(0, 0, 0);
 
-    private final FieldCentric m_fieldCentric = new FieldCentric();
+    private final RobotCentric m_robotCentric = new RobotCentric();
 
-    public FieldCentricFacingAngle() {
+    public RobotCentricFacingAngle() {
         HeadingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) {
         Rotation2d angleToFace = TargetDirection;
-        if (ForwardPerspective == ForwardPerspectiveValue.OperatorPerspective) {
-            /* If we're operator perspective, rotate the direction we want to face by the angle */
-            angleToFace = angleToFace.rotateBy(parameters.operatorForwardDirection);
-        }
 
         double toApplyOmega = TargetRateFeedforward +
             HeadingController.calculate(
@@ -126,7 +102,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
                 parameters.timestamp
             );
 
-        return m_fieldCentric
+        return m_robotCentric
             .withVelocityX(VelocityX)
             .withVelocityY(VelocityY)
             .withRotationalRate(toApplyOmega)
@@ -136,7 +112,6 @@ public class RobotCentricFacingAngle implements SwerveRequest {
             .withDriveRequestType(DriveRequestType)
             .withSteerRequestType(SteerRequestType)
             .withDesaturateWheelSpeeds(DesaturateWheelSpeeds)
-            .withForwardPerspective(ForwardPerspective)
             .apply(parameters, modulesToApply);
     }
 
@@ -155,7 +130,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param kD The differential coefficient; must be >= 0
      * @return this object
      */
-    public FieldCentricFacingAngle withHeadingPID(double kP, double kI, double kD)
+    public RobotCentricFacingAngle withHeadingPID(double kP, double kI, double kD)
     {
         this.HeadingController.setPID(kP, kI, kD);
         return this;
@@ -170,7 +145,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newVelocityX Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withVelocityX(double newVelocityX) {
+    public RobotCentricFacingAngle withVelocityX(double newVelocityX) {
         this.VelocityX = newVelocityX;
         return this;
     }
@@ -184,7 +159,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newVelocityX Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withVelocityX(LinearVelocity newVelocityX) {
+    public RobotCentricFacingAngle withVelocityX(LinearVelocity newVelocityX) {
         this.VelocityX = newVelocityX.in(MetersPerSecond);
         return this;
     }
@@ -199,7 +174,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newVelocityY Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withVelocityY(double newVelocityY) {
+    public RobotCentricFacingAngle withVelocityY(double newVelocityY) {
         this.VelocityY = newVelocityY;
         return this;
     }
@@ -214,7 +189,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newVelocityY Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withVelocityY(LinearVelocity newVelocityY) {
+    public RobotCentricFacingAngle withVelocityY(LinearVelocity newVelocityY) {
         this.VelocityY = newVelocityY.in(MetersPerSecond);
         return this;
     }
@@ -229,7 +204,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newTargetDirection Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withTargetDirection(Rotation2d newTargetDirection) {
+    public RobotCentricFacingAngle withTargetDirection(Rotation2d newTargetDirection) {
         this.TargetDirection = newTargetDirection;
         return this;
     }
@@ -245,7 +220,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newTargetRateFeedforward Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withTargetRateFeedforward(double newTargetRateFeedforward) {
+    public RobotCentricFacingAngle withTargetRateFeedforward(double newTargetRateFeedforward) {
         this.TargetRateFeedforward = newTargetRateFeedforward;
         return this;
     }
@@ -260,7 +235,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newTargetRateFeedforward Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withTargetRateFeedforward(AngularVelocity newTargetRateFeedforward) {
+    public RobotCentricFacingAngle withTargetRateFeedforward(AngularVelocity newTargetRateFeedforward) {
         this.TargetRateFeedforward = newTargetRateFeedforward.in(RadiansPerSecond);
         return this;
     }
@@ -273,7 +248,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newDeadband Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withDeadband(double newDeadband) {
+    public RobotCentricFacingAngle withDeadband(double newDeadband) {
         this.Deadband = newDeadband;
         return this;
     }
@@ -286,7 +261,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newDeadband Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withDeadband(LinearVelocity newDeadband) {
+    public RobotCentricFacingAngle withDeadband(LinearVelocity newDeadband) {
         this.Deadband = newDeadband.in(MetersPerSecond);
         return this;
     }
@@ -299,7 +274,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newRotationalDeadband Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withRotationalDeadband(double newRotationalDeadband) {
+    public RobotCentricFacingAngle withRotationalDeadband(double newRotationalDeadband) {
         this.RotationalDeadband = newRotationalDeadband;
         return this;
     }
@@ -312,7 +287,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newRotationalDeadband Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withRotationalDeadband(AngularVelocity newRotationalDeadband) {
+    public RobotCentricFacingAngle withRotationalDeadband(AngularVelocity newRotationalDeadband) {
         this.RotationalDeadband = newRotationalDeadband.in(RadiansPerSecond);
         return this;
     }
@@ -326,7 +301,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newCenterOfRotation Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withCenterOfRotation(Translation2d newCenterOfRotation) {
+    public RobotCentricFacingAngle withCenterOfRotation(Translation2d newCenterOfRotation) {
         this.CenterOfRotation = newCenterOfRotation;
         return this;
     }
@@ -339,7 +314,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newDriveRequestType Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withDriveRequestType(SwerveModule.DriveRequestType newDriveRequestType) {
+    public RobotCentricFacingAngle withDriveRequestType(SwerveModule.DriveRequestType newDriveRequestType) {
         this.DriveRequestType = newDriveRequestType;
         return this;
     }
@@ -352,7 +327,7 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newSteerRequestType Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withSteerRequestType(SwerveModule.SteerRequestType newSteerRequestType) {
+    public RobotCentricFacingAngle withSteerRequestType(SwerveModule.SteerRequestType newSteerRequestType) {
         this.SteerRequestType = newSteerRequestType;
         return this;
     }
@@ -366,21 +341,8 @@ public class RobotCentricFacingAngle implements SwerveRequest {
      * @param newDesaturateWheelSpeeds Parameter to modify
      * @return this object
      */
-    public FieldCentricFacingAngle withDesaturateWheelSpeeds(boolean newDesaturateWheelSpeeds) {
+    public RobotCentricFacingAngle withDesaturateWheelSpeeds(boolean newDesaturateWheelSpeeds) {
         this.DesaturateWheelSpeeds = newDesaturateWheelSpeeds;
-        return this;
-    }
-
-    /**
-     * Modifies the ForwardPerspective parameter and returns itself.
-     * <p>
-     * The perspective to use when determining which direction is forward.
-     *
-     * @param newForwardPerspective Parameter to modify
-     * @return this object
-     */
-    public FieldCentricFacingAngle withForwardPerspective(ForwardPerspectiveValue newForwardPerspective) {
-        this.ForwardPerspective = newForwardPerspective;
         return this;
     }
 }
