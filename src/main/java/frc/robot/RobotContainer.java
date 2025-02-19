@@ -42,7 +42,12 @@ public class RobotContainer {
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-    private final RobotCentricFacingAngle align = new RobotCentricFacingAngle();
+    
+    // Tune this controller manually or using the m_sysIdRoutineRotation
+    private final RobotCentricFacingAngle align = new RobotCentricFacingAngle()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withHeadingPID(0.01, 0, 0) // DO NOT USE
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -54,8 +59,8 @@ public class RobotContainer {
     public final Elevator elevator = new Elevator();
     //public final Climber climber = new Climber();
 
-    // Tune this controller manually or using the m_sysIdRoutineRotation
-    private final PIDController tagX = new PIDController(0.01, 0, 0);
+    // Tune based on how fast you want to strafe to center on the tag
+    private final PIDController tagX = new PIDController(0.01, 0, 0); // DO NOT USE
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
