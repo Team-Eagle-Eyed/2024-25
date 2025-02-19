@@ -6,11 +6,14 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.List;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,6 +27,8 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
+import frc.robot.util.FieldConstants;
+import frc.robot.util.RobotCentricFacingAngle;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -37,6 +42,7 @@ public class RobotContainer {
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    private final RobotCentricFacingAngle align = new RobotCentricFacingAngle();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -47,6 +53,9 @@ public class RobotContainer {
     public final Intake intake = new Intake();
     public final Elevator elevator = new Elevator();
     //public final Climber climber = new Climber();
+
+    // Tune this controller manually or using the m_sysIdRoutineRotation
+    private final PIDController tagX = new PIDController(0.01, 0, 0);
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -93,6 +102,12 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
+        // Align with Apriltag
+        joystick.leftTrigger().whileTrue(drivetrain.applyRequest(() -> 
+                align.withVelocityX(-joystick.getLeftY() * MaxSpeed)
+                    .withVelocityY(tagX.calculate(LimelightHelpers.getTX("limelight")))
+                    .withTargetDirection(getFaceDirection())));
+
         btnbox.button(0).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM));
         btnbox.button(1).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR));
         btnbox.button(2).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1));
@@ -107,5 +122,9 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
+    }
+
+    private Rotation2d getFaceDirection() {
+        return drivetrain.getState().Pose.nearest(List.of(FieldConstants.Reef.centerFaces)).getRotation();
     }
 }
