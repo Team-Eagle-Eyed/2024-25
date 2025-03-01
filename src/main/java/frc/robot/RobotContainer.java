@@ -82,11 +82,12 @@ public class RobotContainer {
         if(driverIntake || operatorIntake){
             intake.runRollersCommand();
         }*/
-        
+        joystick.rightTrigger().whileTrue(intake.shootCoral());
         joystick.leftTrigger().whileTrue(intake.runRollersCommand());
-        joystick.rightBumper().onTrue(intake.deployIntakes());
+        joystick.leftBumper().onTrue(intake.reverseRollersCommand());
+        //joystick.rightBumper().onTrue(intake.deployIntakes());
         // When the right trigger is pressed shoot whatever game piece based on elevator height
-        joystick.rightTrigger().onTrue(intake.shootAuto(() -> elevator.getGoal()));
+        //joystick.rightTrigger().onTrue(intake.shootAuto(() -> elevator.getGoal()));
 
         /* joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))

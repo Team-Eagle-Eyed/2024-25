@@ -63,12 +63,13 @@ public class Intake extends SubsystemBase implements BaseIntake {
     public void setIntakeVoltage(double voltage) {
         intakeL_motor.setVoltage(voltage);
         intakeR_motor.setVoltage(voltage);
+        intakeC_motor.setVoltage(voltage);
     }
 
     public void setShootVoltage(double voltage) {
         intakeC_motor.setVoltage(voltage);
     }
-
+//Below is not working 3/1/2025
     public Command deployIntakes() {
         return Commands.parallel(
             Commands.runOnce(() -> {
