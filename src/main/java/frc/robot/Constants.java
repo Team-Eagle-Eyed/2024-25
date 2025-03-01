@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Constants {
     public static final class Elevator {
@@ -21,7 +22,7 @@ public class Constants {
                 this.value = value;
             }
         }
-
+        
         public static final double MOTION_LIMIT = 0.3;
 
         public static final double SCORING_MOVEMENT = -0.25;
@@ -39,7 +40,7 @@ public class Constants {
         public static final double MIN_HEIGHT_METERS = 0.005; // TODO
         public static final double MAX_HEIGHT_METERS = 1.57; // TODO
 
-        public static final int CURRENT_LIMIT = 60;
+        public static final int CURRENT_LIMIT = 10;
 
         public static final double kP = 50; // TODO
         public static final double kI = 0; // TODO
@@ -60,7 +61,7 @@ public class Constants {
     public static final class Intake {
         public static enum IntakePosition {
             HOME(0.0698),
-            OUT(0.55);
+            OUT(12);
 
             public final double value;
 
@@ -68,31 +69,31 @@ public class Constants {
                 this.value = value;
             }
         }
-        public static final int ARML_MOTOR_ID = 13;
+        public static final int ARML_MOTOR_ID = 23;
         public static final boolean ARML_MOTOR_INVERTED = true;
-        public static final int ARML_CURRENT_LIMIT = 60;
+        public static final int ARML_CURRENT_LIMIT = 24;
 
-        public static final int ARMR_MOTOR_ID = 13;
+        public static final int ARMR_MOTOR_ID = 21;
         public static final boolean ARMR_MOTOR_INVERTED = true;
-        public static final int ARMR_CURRENT_LIMIT = 60;
+        public static final int ARMR_CURRENT_LIMIT = 24;
 
-        public static final int INTAKEL_MOTOR_ID = 13;
+        public static final int INTAKEL_MOTOR_ID = 24;
         public static final boolean INTAKEL_MOTOR_INVERTED = true;
-        public static final int INTAKEL_CURRENT_LIMIT = 60;
+        public static final int INTAKEL_CURRENT_LIMIT = 10;
 
-        public static final int INTAKEC_MOTOR_ID = 13;
+        public static final int INTAKEC_MOTOR_ID = 30;
         public static final boolean INTAKEC_MOTOR_INVERTED = true;
-        public static final int INTAKEC_CURRENT_LIMIT = 60;
+        public static final int INTAKEC_CURRENT_LIMIT = 10;
 
-        public static final int INTAKER_MOTOR_ID = 13;
+        public static final int INTAKER_MOTOR_ID = 22;
         public static final boolean INTAKER_MOTOR_INVERTED = true;
-        public static final int INTAKER_CURRENT_LIMIT = 60;
+        public static final int INTAKER_CURRENT_LIMIT = 10;
     }
 
     public static final class Climber {
         public static final int MOTOR_ID = 6;
         public static final boolean MOTOR_INVERTED = false;
-        public static final int CURRENT_LIMIT = 60;
+        public static final int CURRENT_LIMIT = 10;
 
         public static final double MIN_POSITION_METERS = 0.0;
         public static final double MAX_POSITION_METERS = 1.0; // TODO

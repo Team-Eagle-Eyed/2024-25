@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -41,7 +42,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
-    private final CommandGenericHID btnbox = new CommandGenericHID(1);
+    private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Intake intake = new Intake();
@@ -69,19 +70,30 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
+        //elevator.setDefaultCommand(new InstantCommand(() -> elevator.getPosition()));
 
         // While left trigger is held run the weed wackers
-        joystick.leftTrigger().whileTrue(intake.runRollersCommand());
 
+        /*Boolean driverIntake;
+        Boolean operatorIntake;
+
+        joystick.leftTrigger();
+
+        if(driverIntake || operatorIntake){
+            intake.runRollersCommand();
+        }*/
+        
+        joystick.leftTrigger().whileTrue(intake.runRollersCommand());
+        joystick.rightBumper().onTrue(intake.deployIntakes());
         // When the right trigger is pressed shoot whatever game piece based on elevator height
         joystick.rightTrigger().onTrue(intake.shootAuto(() -> elevator.getGoal()));
 
-        joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
+        /* joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
         joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        );
+        ); */
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -93,13 +105,13 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        btnbox.button(0).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM));
-        btnbox.button(1).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR));
-        btnbox.button(2).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1));
-        btnbox.button(3).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2));
-        btnbox.button(4).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3));
-        btnbox.button(5).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4));
-        btnbox.button(6).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE));
+        operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM));
+        operator.b().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR));
+        operator.x().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1));
+        operator.y().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2));
+        operator.leftBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3));
+        operator.rightBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4));
+        operator.pov(180).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

@@ -15,6 +15,7 @@ import com.techhounds.houndutil.houndlog.annotations.LoggedObject;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
@@ -22,6 +23,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -51,7 +53,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
             kG, kV, kA);
 
     @Log
-    private ElevatorPosition goal;
+    private ElevatorPosition goal = frc.robot.Constants.Elevator.ElevatorPosition.BOTTOM;
 
     /**
      * The representation of the "elevator" for simulation. (even though this is a
@@ -121,12 +123,14 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         simVelocity = elevatorSim.getVelocityMetersPerSecond();
     }
 
+
     public boolean getInitialized() {
         return initialized;
     }
 
     @Override
     public double getPosition() {
+        SmartDashboard.putNumber("ElevatorPosition", motor.getEncoder().getPosition());
         return motor.getEncoder().getPosition();
     }
 
