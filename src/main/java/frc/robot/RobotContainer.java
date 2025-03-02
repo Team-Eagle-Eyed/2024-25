@@ -39,8 +39,9 @@ public class RobotContainer {
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-    private final Telemetry logger = new Telemetry(MaxSpeed);
-
+// Brian-disabled logging so that it did not fill up storage 3/2/25    
+private final Telemetry logger = new Telemetry(MaxSpeed);
+//SignalLogger.stop(); // Can this even go here?
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController operator = new CommandXboxController(1);
 
@@ -82,10 +83,12 @@ public class RobotContainer {
         if(driverIntake || operatorIntake){
             intake.runRollersCommand();
         }*/
-        joystick.rightTrigger().whileTrue(intake.shootCoral());
-        joystick.leftTrigger().whileTrue(intake.runRollersCommand());
-        joystick.leftBumper().onTrue(intake.reverseRollersCommand());
-        //joystick.rightBumper().onTrue(intake.deployIntakes());
+        joystick.pov(180).whileTrue(intake.shootCoral());
+        joystick.pov(0).whileTrue(intake.shootAlgae());
+        joystick.rightTrigger().whileTrue(intake.runRollersCommand());
+        joystick.rightBumper().whileTrue(intake.reverseRollersCommand());
+        joystick.leftBumper().onTrue(intake.retractIntakes());
+        joystick.leftTrigger().onTrue(intake.deployIntakes());
         // When the right trigger is pressed shoot whatever game piece based on elevator height
         //joystick.rightTrigger().onTrue(intake.shootAuto(() -> elevator.getGoal()));
 
@@ -104,7 +107,9 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        //joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // changed to X and A BLT 3/2/25
+        joystick.x().and(joystick.a()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM));
         operator.b().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR));

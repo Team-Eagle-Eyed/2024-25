@@ -44,7 +44,7 @@ public class Intake extends SubsystemBase implements BaseIntake {
 
     public Intake() {
         config.closedLoop
-            .p(0.1)
+            .p(0.05)
             .i(0)
             .d(0)
             .outputRange(-1, 1)
@@ -52,10 +52,12 @@ public class Intake extends SubsystemBase implements BaseIntake {
         armL_motor = createMotor(ARML_MOTOR_INVERTED, ARML_CURRENT_LIMIT, ARML_MOTOR_ID);
         armR_motor = createMotor(ARMR_MOTOR_INVERTED, ARMR_CURRENT_LIMIT, ARMR_MOTOR_ID);
         intakeL_motor = createMotor(INTAKEL_MOTOR_INVERTED, 40, INTAKEL_MOTOR_ID);
-        intakeC_motor = createMotor(INTAKEC_MOTOR_INVERTED, INTAKEC_CURRENT_LIMIT, INTAKEC_MOTOR_ID);
+        intakeC_motor = createMotor(INTAKEC_MOTOR_INVERTED, 40, INTAKEC_MOTOR_ID);
         intakeR_motor = createMotor(false,40, INTAKER_MOTOR_ID);
-        intakeL_motor.configure(config, null, PersistMode.kPersistParameters);
-        intakeR_motor.configure(config, null, PersistMode.kPersistParameters);
+        //intakeL_motor.configure(config, null, PersistMode.kPersistParameters);
+        //intakeR_motor.configure(config, null, PersistMode.kPersistParameters);
+        armL_motor.configure(config, null, PersistMode.kPersistParameters);
+        armR_motor.configure(config, null, PersistMode.kPersistParameters);
         
         
     }
@@ -71,11 +73,12 @@ public class Intake extends SubsystemBase implements BaseIntake {
     }
 //Below is not working 3/1/2025
     public Command deployIntakes() {
+        System.out.println("Deployintakes happend"); 
         return Commands.parallel(
             Commands.runOnce(() -> {
                 armL_motor.getClosedLoopController().setReference(IntakePosition.OUT.value, ControlType.kPosition, ClosedLoopSlot.kSlot0);
                 
-                SmartDashboard.putNumber("intakemotarpos", intakeL_motor.getEncoder().getPosition());
+                SmartDashboard.putNumber("intakemotarpos", armL_motor.getEncoder().getPosition());
             }),
             Commands.runOnce(() -> armR_motor.getClosedLoopController().setReference(IntakePosition.OUT.value, ControlType.kPosition)))
             .withName("intake.deployIntakes");
@@ -90,14 +93,14 @@ public class Intake extends SubsystemBase implements BaseIntake {
  
     public Command shootCoral() {
         return Commands.startEnd(
-                () -> setShootVoltage(3),
+                () -> setShootVoltage(12),
                 () -> setShootVoltage(0))
                 .withName("intake.shootCoral");
     }
 
     public Command shootAlgae() {
         return Commands.startEnd(
-                () -> setShootVoltage(-3),
+                () -> setShootVoltage(-12),
                 () -> setShootVoltage(0))
                 .withName("intake.shootAlgae");
     }
