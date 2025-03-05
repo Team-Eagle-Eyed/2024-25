@@ -125,7 +125,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
 
     public boolean getInitialized() {
-        return initialized;
+        return initialized; //reset the encoder
     }
 
     @Override
@@ -181,7 +181,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                 runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
                 moveToCurrentGoalCommand()
                         .until(() -> pidController.atGoal()))
-                .withTimeout(3)
+                .withTimeout(7)
                 .withName("elevator.moveToPosition");
     }
 

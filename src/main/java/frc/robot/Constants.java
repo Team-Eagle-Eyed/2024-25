@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Constants {
     public static final class Elevator {
         public static enum ElevatorPosition {
-            BOTTOM(0.02),
-            PROCESSOR(0.1234),
-            L1(0.323),
-            L2(0.60),
-            L3(0.75),
-            L4(1.27),
-            ALGAE(1.57);
+            BOTTOM(0),
+            PROCESSOR(0.2),
+            L1(0.3),
+            L2(0.4),
+            L3(0.6),
+            L4(0.8),
+            ALGAE(2.3);
 
             public final double value;
 
@@ -23,7 +23,7 @@ public class Constants {
             }
         }
         
-        public static final double MOTION_LIMIT = 0.3;
+        public static final double MOTION_LIMIT = 0;
 
         public static final double SCORING_MOVEMENT = -0.25;
 
@@ -31,23 +31,23 @@ public class Constants {
         public static final boolean MOTOR_INVERTED = true;
 
         public static final DCMotor MOTOR_GEARBOX_REPR = DCMotor.getNEO(1);
-        public static final double GEARING = 25.0;
+        public static final double GEARING = 9;
         public static final double MASS_KG = Units.lbsToKilograms(5);
-        public static final double DRUM_RADIUS_METERS = Units.inchesToMeters(1.32) / 2.0; // TODO
+        public static final double DRUM_RADIUS_METERS = Units.inchesToMeters(1.75) / 2.0; // done
         public static final double DRUM_CIRCUMFERENCE = 2.0 * Math.PI * DRUM_RADIUS_METERS;
         public static final double ENCODER_ROTATIONS_TO_METERS = DRUM_CIRCUMFERENCE / GEARING;
 
-        public static final double MIN_HEIGHT_METERS = 0.05; // TODO
-        public static final double MAX_HEIGHT_METERS = 1.57; // TODO
+        public static final double MIN_HEIGHT_METERS = 0.0; // done
+        public static final double MAX_HEIGHT_METERS = 2.5; //done
 
         public static final int CURRENT_LIMIT = 60;
 
-        public static final double kP = 2; // TODO
-        public static final double kI = 0; // TODO
-        public static final double kD = 5; // TODO
+        public static final double kP = 2.5; // TODO
+        public static final double kI = 0.; // TODO
+        public static final double kD = 1; // TODO
         public static final double kS = 0.095388; // TODO
         //public static final double kG = 0.54402; // TODO
-        public static final double kG = 0.1; // BLT todo
+        public static final double kG = 0.05; // BLT todo
         public static final double kV = 7.43; // TODO
         public static final double kA = 1.0; // TODO
         public static final double TOLERANCE = 0.02;
@@ -62,7 +62,8 @@ public class Constants {
     public static final class Intake {
         public static enum IntakePosition {
             HOME(0.5),
-            OUT(14);
+            OUT(14.5),
+            GRAB(14.5);
 
             public final double value;
 

@@ -40,7 +40,8 @@ public class Intake extends SubsystemBase implements BaseIntake {
     private final SparkMax intakeR_motor;
 
     SparkMaxConfig config = new SparkMaxConfig();
-    
+
+    private boolean rollersAllowed = false;
 
     public Intake() {
         config.closedLoop
@@ -72,19 +73,21 @@ public class Intake extends SubsystemBase implements BaseIntake {
         intakeC_motor.setVoltage(voltage);
     }
 //Below is not working 3/1/2025
-    public Command deployIntakes() {
+    public Command deployIntakes(double position) {
+        rollersAllowed = true;
         System.out.println("Deployintakes happend"); 
         return Commands.parallel(
             Commands.runOnce(() -> {
-                armL_motor.getClosedLoopController().setReference(IntakePosition.OUT.value, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+                armL_motor.getClosedLoopController().setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0);
                 
                 SmartDashboard.putNumber("intakemotarpos", armL_motor.getEncoder().getPosition());
             }),
-            Commands.runOnce(() -> armR_motor.getClosedLoopController().setReference(IntakePosition.OUT.value, ControlType.kPosition)))
+            Commands.runOnce(() -> armR_motor.getClosedLoopController().setReference(position, ControlType.kPosition)))
             .withName("intake.deployIntakes");
     }
 
     public Command retractIntakes() {
+        rollersAllowed = false;
         return Commands.parallel(
             Commands.runOnce(() -> armL_motor.getClosedLoopController().setReference(IntakePosition.HOME.value, ControlType.kPosition)),
             Commands.runOnce(() -> armR_motor.getClosedLoopController().setReference(IntakePosition.HOME.value, ControlType.kPosition)))
@@ -135,10 +138,26 @@ public class Intake extends SubsystemBase implements BaseIntake {
 
     @Override
     public Command runRollersCommand() {
-        return Commands.startEnd(
-                () -> setIntakeVoltage(-12),
-                () -> setIntakeVoltage(0))
+        if(true){
+            return MoveIn(-12, IntakePosition.GRAB.value)
                 .withName("intake.runIntakes");
+        }
+        else{
+            return Commands.run(() -> setIntakeVoltage(0)).withName("intake.runIntakes");
+        }
+    }
+
+    public Command stopRollersCommand() {
+        return MoveIn(0, IntakePosition.OUT.value);
+    }
+
+    public Command MoveIn(double voltage, double position) {
+        return Commands.parallel(
+            new InstantCommand(() -> setIntakeVoltage(voltage)),
+            deployIntakes(position)
+        );
+            
+            
     }
 
     @Override

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.Elevator.ElevatorPosition;
+import frc.robot.Constants.Intake.IntakePosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -86,9 +87,10 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         joystick.pov(180).whileTrue(intake.shootCoral());
         joystick.pov(0).whileTrue(intake.shootAlgae());
         joystick.rightTrigger().whileTrue(intake.runRollersCommand());
+        joystick.rightTrigger().onFalse(intake.stopRollersCommand());
         joystick.rightBumper().whileTrue(intake.reverseRollersCommand());
         joystick.leftBumper().onTrue(intake.retractIntakes());
-        joystick.leftTrigger().onTrue(intake.deployIntakes());
+        joystick.leftTrigger().onTrue(intake.deployIntakes(IntakePosition.OUT.value));
         // When the right trigger is pressed shoot whatever game piece based on elevator height
         //joystick.rightTrigger().onTrue(intake.shootAuto(() -> elevator.getGoal()));
 
@@ -109,6 +111,7 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         // reset the field-centric heading on left bumper press
         //joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         // changed to X and A BLT 3/2/25
+      
         joystick.x().and(joystick.a()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM));
@@ -118,7 +121,8 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         operator.leftBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3));
         operator.rightBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4));
         operator.pov(180).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE));
-
+        operator.rightTrigger().whileTrue(intake.shootAlgae());
+        operator.leftTrigger().whileTrue(intake.shootCoral());
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
