@@ -10,10 +10,10 @@ public class Constants {
         public static enum ElevatorPosition {
             BOTTOM(0),
             PROCESSOR(0.2),
-            L1(0.3),
-            L2(0.4),
-            L3(0.6),
-            L4(0.8),
+            L1(0.5),
+            L2(0.7),
+            L3(1.1),
+            L4(1.4),
             ALGAE(2.3);
 
             public final double value;
@@ -62,8 +62,8 @@ public class Constants {
     public static final class Intake {
         public static enum IntakePosition {
             HOME(0.5),
-            OUT(14.5),
-            GRAB(14.5);
+            OUT(15),
+            GRAB(15);
 
             public final double value;
 

@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.techhounds.houndutil.houndlib.Utils;
 import com.techhounds.houndutil.houndlib.subsystems.BaseLinearMechanism;
@@ -246,5 +247,10 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     public boolean atGoal() {
         return pidController.atGoal();
+    }
+    public double drivetrainModifier(){
+        double Elevatorlimiter = 1.0d;
+        Elevatorlimiter = Math.abs(1-getPosition() *0.25);
+        return Elevatorlimiter;
     }
 }
