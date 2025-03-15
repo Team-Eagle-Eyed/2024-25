@@ -167,4 +167,5 @@ public class Intake extends SubsystemBase implements BaseIntake {
                 () -> setIntakeVoltage(0))
                 .withName("intake.reverseIntakes");
     }
+    
 }

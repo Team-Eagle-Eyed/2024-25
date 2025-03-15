@@ -32,6 +32,7 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double driveSpeedLimiter = 1.0d;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -69,7 +70,7 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed  * elevator.drivetrainModifier()) // Drive forward with negative Y (forward)
+                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed  * driveSpeedLimiter) // Drive forward with negative Y (forward)
                     .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
@@ -93,6 +94,7 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         joystick.rightBumper().whileTrue(intake.reverseRollersCommand());
         joystick.leftBumper().onTrue(intake.retractIntakes());
         joystick.leftTrigger().onTrue(intake.deployIntakes(IntakePosition.OUT.value));
+        //joystick.pov(90).whileTrue(null);
         // When the right trigger is pressed shoot whatever game piece based on elevator height
         //joystick.rightTrigger().onTrue(intake.shootAuto(() -> elevator.getGoal()));
 
@@ -126,7 +128,9 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         operator.rightTrigger().whileTrue(intake.shootAlgae());
         operator.leftTrigger().whileTrue(intake.shootCoral());
         drivetrain.registerTelemetry(logger::telemeterize);
+        operator.pov(90).onTrue(intake.retractIntakes());
     }
+
 
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */

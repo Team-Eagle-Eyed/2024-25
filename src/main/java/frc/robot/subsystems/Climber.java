@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.techhounds.houndutil.houndlog.annotations.Log;
 import com.techhounds.houndutil.houndlog.annotations.LoggedObject;
@@ -18,15 +20,15 @@ import static frc.robot.Constants.Climber.*;
 @LoggedObject
 public class Climber extends SubsystemBase {
     @Log
-    private final SparkMax motor;
+    private final SparkFlex motor;
 
-    private SparkMaxConfig motorConfig;
+    private SparkFlexConfig motorConfig;
 
     @Log
     private boolean initialized;
 
     public Climber() {
-        motorConfig = new SparkMaxConfig();
+        motorConfig = new SparkFlexConfig();
         motorConfig
                 .inverted(MOTOR_INVERTED)
                 .idleMode(IdleMode.kBrake)
@@ -35,7 +37,7 @@ public class Climber extends SubsystemBase {
                 .positionConversionFactor(ENCODER_ROTATIONS_TO_METERS)
                 .velocityConversionFactor(ENCODER_ROTATIONS_TO_METERS / 60.0);
 
-        motor = new SparkMax(MOTOR_ID, MotorType.kBrushless);
+        motor = new SparkFlex(MOTOR_ID, MotorType.kBrushless);
         motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         motor.getEncoder().setPosition(0);
@@ -77,3 +79,5 @@ public class Climber extends SubsystemBase {
         return runOnce(this::resetPosition).withName("arm.resetPosition");
     }
 }
+
+
