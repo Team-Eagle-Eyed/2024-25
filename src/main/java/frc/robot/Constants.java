@@ -60,36 +60,27 @@ public class Constants {
     
 
     public static final class Intake {
-        public static enum IntakePosition {
-            HOME(0.5),
-            OUT(15),
-            GRAB(15);
+        public static enum IntakeMode {
+            INTAKE(6.0),
+            HOLD(1.0),
+            OFF(0.0),
+            SHOOT(-6.0);
 
             public final double value;
 
-            private IntakePosition(double value) {
+            private IntakeMode(double value) {
                 this.value = value;
             }
         }
-        public static final int ARML_MOTOR_ID = 23;
-        public static final boolean ARML_MOTOR_INVERTED = true;
-        public static final int ARML_CURRENT_LIMIT = 15;
+        public static final int INTAKE_CURRENT_SHUTOFF = 20;
 
-        public static final int ARMR_MOTOR_ID = 21;
-        public static final boolean ARMR_MOTOR_INVERTED = false;
-        public static final int ARMR_CURRENT_LIMIT = 15;
+        public static final int INTAKETOP_MOTOR_ID = 24;
+        public static final boolean INTAKETOP_MOTOR_INVERTED = true;
+        public static final int INTAKETOP_CURRENT_LIMIT = 25;
 
-        public static final int INTAKEL_MOTOR_ID = 24;
-        public static final boolean INTAKEL_MOTOR_INVERTED = true;
-        public static final int INTAKEL_CURRENT_LIMIT = 25;
-
-        public static final int INTAKEC_MOTOR_ID = 30;
-        public static final boolean INTAKEC_MOTOR_INVERTED = true;
-        public static final int INTAKEC_CURRENT_LIMIT = 25;
-
-        public static final int INTAKER_MOTOR_ID = 22;
-        public static final boolean INTAKER_MOTOR_INVERTED = true;
-        public static final int INTAKER_CURRENT_LIMIT = 25;
+        public static final int INTAKEBOTTOM_MOTOR_ID = 30;
+        public static final boolean INTAKEBOTTOM_MOTOR_INVERTED = true;
+        public static final int INTAKEBOTTOM_CURRENT_LIMIT = 25;
     }
 
     public static final class Climber {
