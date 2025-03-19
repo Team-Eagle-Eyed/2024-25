@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -31,7 +32,7 @@ public class Intake extends SubsystemBase implements BaseIntake {
     @Log
     private final SparkMax intakeTop_motor;
     @Log
-    private final SparkMax intakeBottom_motor;
+    private final SparkFlex intakeBottom_motor;
 
     SparkMaxConfig config = new SparkMaxConfig();
 
@@ -45,7 +46,7 @@ public class Intake extends SubsystemBase implements BaseIntake {
             .outputRange(-1, 1)
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
         intakeTop_motor = createMotor(INTAKETOP_MOTOR_INVERTED, 40, INTAKETOP_MOTOR_ID);
-        intakeBottom_motor = createMotor(INTAKEBOTTOM_MOTOR_INVERTED, 40, INTAKEBOTTOM_MOTOR_ID);
+        intakeBottom_motor = createflex(INTAKEBOTTOM_MOTOR_INVERTED, 40, INTAKEBOTTOM_MOTOR_ID);
     }
 
     private void setIntakeVoltage(double voltage) {
@@ -103,7 +104,17 @@ public class Intake extends SubsystemBase implements BaseIntake {
         motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         return motor;
     }
-
+    private SparkFlex createflex(Boolean inverted, Integer currentLimit, Integer devID){
+        var motorConfig = new SparkFlexConfig(); 
+        motorConfig
+    .inverted(inverted)
+    .idleMode(IdleMode.kBrake)
+    .smartCurrentLimit(currentLimit);
+    
+    var motor = new SparkFlex(devID,MotorType.kBrushless);
+    motor.configure(motorConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+    return motor;
+    }
     @Override
     public Command runRollersCommand() {
         return intakeAlgae();

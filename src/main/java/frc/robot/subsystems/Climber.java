@@ -65,7 +65,7 @@ public class Climber extends SubsystemBase {
 
     public Command winchDownCommand() {
         return Commands.startEnd(
-                () -> setVoltage(12),
+                () -> setVoltage(-12),
                 () -> setVoltage(0))
                 .withName("climber.winchDown");
     }
