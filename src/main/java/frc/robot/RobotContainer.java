@@ -71,7 +71,7 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-joystick.getLeftY() * MaxSpeed  * driveSpeedLimiter) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * driveSpeedLimiter) // Drive left with negative X (left)
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -118,13 +118,13 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
       
         joystick.x().and(joystick.a()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM));
-        operator.b().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR));
-        operator.x().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1));
-        operator.y().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2));
-        operator.leftBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3));
-        operator.rightBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4));
-        operator.pov(180).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE));
+        operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM).andThen(() -> driveSpeedLimiter = 1.0));
+        operator.b().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR).andThen(() -> driveSpeedLimiter = 1.0));
+        operator.x().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1).andThen(() -> driveSpeedLimiter = 0.9));
+        operator.y().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2).andThen(() -> driveSpeedLimiter = 0.7));
+        operator.leftBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3).andThen(() -> driveSpeedLimiter = 0.6));
+        operator.rightBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4).andThen(() -> driveSpeedLimiter = 0.5));
+        operator.pov(180).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE).andThen(() -> driveSpeedLimiter = 0.4));
         operator.rightTrigger().whileTrue(intake.shootAlgae());
         operator.leftTrigger().whileTrue(intake.shootCoral());
         drivetrain.registerTelemetry(logger::telemeterize);
