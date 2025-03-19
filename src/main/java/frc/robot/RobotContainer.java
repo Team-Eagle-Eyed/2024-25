@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.Elevator.ElevatorPosition;
-import frc.robot.Constants.Intake.IntakePosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -75,35 +74,6 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-        //elevator.setDefaultCommand(new InstantCommand(() -> elevator.getPosition()));
-
-        // While left trigger is held run the weed wackers
-
-        /*Boolean driverIntake;
-        Boolean operatorIntake;
-
-        joystick.leftTrigger();
-
-        if(driverIntake || operatorIntake){
-            intake.runRollersCommand();
-        }*/
-        joystick.pov(180).whileTrue(intake.shootCoral());
-        joystick.pov(0).whileTrue(intake.shootAlgae());
-        joystick.rightTrigger().whileTrue(intake.runRollersCommand());
-        joystick.rightTrigger().onFalse(intake.stopRollersCommand());
-        joystick.rightBumper().whileTrue(intake.reverseRollersCommand());
-        joystick.leftBumper().onTrue(intake.retractIntakes());
-        joystick.leftTrigger().onTrue(intake.deployIntakes(IntakePosition.OUT.value));
-        //joystick.pov(90).whileTrue(null);
-        // When the right trigger is pressed shoot whatever game piece based on elevator height
-        //joystick.rightTrigger().onTrue(intake.shootAuto(() -> elevator.getGoal()));
-
-        /* joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        );
-        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        ); */
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -111,14 +81,12 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-        // reset the field-centric heading on left bumper press
-        //joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        // changed to X and A BLT 3/2/25
       
         joystick.x().and(joystick.a()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM).andThen(() -> driveSpeedLimiter = 1.0));
+        operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM)
+            .andThen(() -> driveSpeedLimiter = 1.0)
+            .andThen(intake.intakeAlgae()));
         operator.b().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR).andThen(() -> driveSpeedLimiter = 1.0));
         operator.x().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1).andThen(() -> driveSpeedLimiter = 0.9));
         operator.y().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2).andThen(() -> driveSpeedLimiter = 0.7));
@@ -126,9 +94,9 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         operator.rightBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4).andThen(() -> driveSpeedLimiter = 0.5));
         operator.pov(180).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE).andThen(() -> driveSpeedLimiter = 0.4));
         operator.rightTrigger().whileTrue(intake.shootAlgae());
-        operator.leftTrigger().whileTrue(intake.shootCoral());
+        operator.leftTrigger().whileTrue(intake.shootAlgaeTop());
+        operator.a().whileTrue(intake.intakeAlgae());
         drivetrain.registerTelemetry(logger::telemeterize);
-        operator.pov(90).onTrue(intake.retractIntakes());
     }
 
 

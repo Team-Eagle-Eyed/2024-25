@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Elevator.ElevatorPosition;
-import frc.robot.Constants.Intake.IntakePosition;
+import frc.robot.Constants.Intake.IntakeMode;
 
 import static frc.robot.Constants.Intake.*;
 
@@ -29,15 +29,9 @@ import java.util.function.Supplier;
 @LoggedObject
 public class Intake extends SubsystemBase implements BaseIntake {
     @Log
-    private final SparkMax armL_motor;
+    private final SparkMax intakeTop_motor;
     @Log
-    private final SparkMax armR_motor;
-    @Log
-    private final SparkMax intakeL_motor;
-    @Log
-    private final SparkMax intakeC_motor;
-    @Log
-    private final SparkMax intakeR_motor;
+    private final SparkMax intakeBottom_motor;
 
     SparkMaxConfig config = new SparkMaxConfig();
 
@@ -50,61 +44,35 @@ public class Intake extends SubsystemBase implements BaseIntake {
             .d(0)
             .outputRange(-1, 1)
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-        armL_motor = createMotor(ARML_MOTOR_INVERTED, ARML_CURRENT_LIMIT, ARML_MOTOR_ID);
-        armR_motor = createMotor(ARMR_MOTOR_INVERTED, ARMR_CURRENT_LIMIT, ARMR_MOTOR_ID);
-        intakeL_motor = createMotor(INTAKEL_MOTOR_INVERTED, 40, INTAKEL_MOTOR_ID);
-        intakeC_motor = createMotor(INTAKEC_MOTOR_INVERTED, 40, INTAKEC_MOTOR_ID);
-        intakeR_motor = createMotor(false,40, INTAKER_MOTOR_ID);
-        //intakeL_motor.configure(config, null, PersistMode.kPersistParameters);
-        //intakeR_motor.configure(config, null, PersistMode.kPersistParameters);
-        armL_motor.configure(config, null, PersistMode.kPersistParameters);
-        armR_motor.configure(config, null, PersistMode.kPersistParameters);
-        
-        
+        intakeTop_motor = createMotor(INTAKETOP_MOTOR_INVERTED, 40, INTAKETOP_MOTOR_ID);
+        intakeBottom_motor = createMotor(INTAKEBOTTOM_MOTOR_INVERTED, 40, INTAKEBOTTOM_MOTOR_ID);
     }
 
-    public void setIntakeVoltage(double voltage) {
-        intakeL_motor.setVoltage(voltage);
-        intakeR_motor.setVoltage(voltage);
-        intakeC_motor.setVoltage(voltage);
-    }
-
-    public void setShootVoltage(double voltage) {
-        intakeC_motor.setVoltage(voltage);
-    }
-//Below is not working 3/1/2025
-    public Command deployIntakes(double position) {
-        rollersAllowed = true;
-        System.out.println("Deployintakes happend"); 
-        return Commands.parallel(
-            Commands.runOnce(() -> {
-                armL_motor.getClosedLoopController().setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-                
-                SmartDashboard.putNumber("intakemotarpos", armL_motor.getEncoder().getPosition());
-            }),
-            Commands.runOnce(() -> armR_motor.getClosedLoopController().setReference(position, ControlType.kPosition)))
-            .withName("intake.deployIntakes");
-    }
-
-    public Command retractIntakes() {
-        rollersAllowed = false;
-        return Commands.parallel(
-            Commands.runOnce(() -> armL_motor.getClosedLoopController().setReference(IntakePosition.HOME.value, ControlType.kPosition)),
-            Commands.runOnce(() -> armR_motor.getClosedLoopController().setReference(IntakePosition.HOME.value, ControlType.kPosition)))
-            .withName("intake.retractIntakes");
-    }
- 
-    public Command shootCoral() {
-        return Commands.startEnd(
-                () -> setShootVoltage(12),
-                () -> setShootVoltage(0))
-                .withName("intake.shootCoral");
+    private void setIntakeVoltage(double voltage) {
+        intakeTop_motor.setVoltage(voltage);
+        intakeBottom_motor.setVoltage(voltage);
     }
 
     public Command shootAlgae() {
         return Commands.startEnd(
-                () -> setShootVoltage(-12),
-                () -> setShootVoltage(0))
+                () -> setIntakeVoltage(IntakeMode.SHOOT.value),
+                () -> setIntakeVoltage(IntakeMode.OFF.value))
+                .withName("intake.shootAlgae");
+    }
+
+    public Command intakeAlgae() {
+        return Commands.startEnd(
+                () -> setIntakeVoltage(IntakeMode.INTAKE.value),
+                () -> setIntakeVoltage(IntakeMode.HOLD.value))
+                .until(() -> intakeTop_motor.getOutputCurrent() > INTAKE_CURRENT_SHUTOFF)
+                .withName("intake.intakeAlgae");
+    }
+
+    public Command shootAlgaeTop() {
+        return Commands.startEnd(
+                () -> {intakeTop_motor.setVoltage(IntakeMode.SHOOT.value);
+                        intakeBottom_motor.setVoltage(IntakeMode.OFF.value);},
+                () -> setIntakeVoltage(IntakeMode.OFF.value))
                 .withName("intake.shootAlgae");
     }
 
@@ -118,7 +86,7 @@ public class Intake extends SubsystemBase implements BaseIntake {
             case L2:
             case L3:
             case L4:
-                return shootCoral().withTimeout(0.5);
+                return shootAlgae().withTimeout(0.5);
             default:
                 return Commands.none();
         }
@@ -138,34 +106,12 @@ public class Intake extends SubsystemBase implements BaseIntake {
 
     @Override
     public Command runRollersCommand() {
-        if(true){
-            return MoveIn(-12, IntakePosition.GRAB.value)
-                .withName("intake.runIntakes");
-        }
-        else{
-            return Commands.run(() -> setIntakeVoltage(0)).withName("intake.runIntakes");
-        }
-    }
-
-    public Command stopRollersCommand() {
-        return MoveIn(0, IntakePosition.OUT.value);
-    }
-
-    public Command MoveIn(double voltage, double position) {
-        return Commands.parallel(
-            new InstantCommand(() -> setIntakeVoltage(voltage)),
-            deployIntakes(position)
-        );
-            
-            
+        return intakeAlgae();
     }
 
     @Override
     public Command reverseRollersCommand() {
-        return Commands.startEnd(
-                () -> setIntakeVoltage(12),
-                () -> setIntakeVoltage(0))
-                .withName("intake.reverseIntakes");
+        return shootAlgae();
     }
     
 }
