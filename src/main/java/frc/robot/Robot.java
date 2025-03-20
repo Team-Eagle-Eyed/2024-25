@@ -77,7 +77,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    // Height at 0 should produce 30% power and Max height (2.35) will give full power (1.0 or 100%)
+    m_robotContainer.driveSpeedLimiter = ((1 - (m_robotContainer.elevator.getPosition() / 2.35)) * 0.7) + 0.3;
+  }
 
   @Override
   public void teleopExit() {}

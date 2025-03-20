@@ -31,7 +31,7 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-    private double driveSpeedLimiter = 1.0d;
+    public double driveSpeedLimiter = 1.0d;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -87,12 +87,12 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM)
             .andThen(() -> driveSpeedLimiter = 1.0)
             .andThen(intake.intakeAlgae()));
-        operator.b().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR).andThen(() -> driveSpeedLimiter = 1.0));
-        operator.x().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1).andThen(() -> driveSpeedLimiter = 0.9));
-        operator.y().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2).andThen(() -> driveSpeedLimiter = 0.7));
-        operator.leftBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3).andThen(() -> driveSpeedLimiter = 0.6));
-        operator.rightBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4).andThen(() -> driveSpeedLimiter = 0.5));
-        operator.pov(180).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE).andThen(() -> driveSpeedLimiter = 0.4));
+        operator.b().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR));
+        operator.x().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1));
+        operator.y().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2));
+        operator.leftBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3));
+        operator.rightBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4));
+        operator.pov(180).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE));
         operator.rightTrigger().whileTrue(intake.shootAlgae());
         operator.leftTrigger().whileTrue(intake.shootAlgaeTop());
         operator.a().whileTrue(intake.intakeAlgae());
