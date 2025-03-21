@@ -81,7 +81,8 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-      
+        joystick.rightTrigger().whileTrue(intake.intakeAlgae());
+        joystick.leftTrigger().whileTrue(intake.shootAlgae());
         joystick.x().and(joystick.a()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM)
@@ -93,9 +94,9 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         operator.leftBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L3));
         operator.rightBumper().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L4));
         operator.pov(180).onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE));
-        operator.rightTrigger().whileTrue(intake.shootAlgae());
-        operator.leftTrigger().whileTrue(intake.shootAlgaeTop());
-        operator.a().whileTrue(intake.intakeAlgae());
+        operator.rightTrigger().whileTrue(intake.intakeAlgae());
+        operator.leftTrigger().whileTrue(intake.shootAlgae());
+        operator.pov(90).whileTrue(intake.shootAlgaeTop());
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
