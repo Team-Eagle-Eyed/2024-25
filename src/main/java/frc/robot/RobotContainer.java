@@ -12,11 +12,13 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -51,15 +53,19 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Intake intake = new Intake();
     public final Elevator elevator = new Elevator();
+    public final Climber climber =  new Climber();
     //public final Climber climber = new Climber();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+
+        NamedCommands.registerCommand("autointake", intake.intakeAlgae());
+        NamedCommands.registerCommand("autoelevator", (elevator.moveToPositionCommand(() -> ElevatorPosition.L1)));
+
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
-
         configureBindings();
     }
 
@@ -83,11 +89,13 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
         joystick.rightTrigger().whileTrue(intake.intakeAlgae());
         joystick.leftTrigger().whileTrue(intake.shootAlgae());
+       // joystick.leftBumper().toggleOnTrue(Commands.startEnd(driveSpeedLimiter = 0.2, () driveSpeedLimiter = 1.0));
+        joystick.pov(0).whileTrue(climber.winchDownCommand());
         joystick.x().and(joystick.a()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM)
-            .andThen(() -> driveSpeedLimiter = 1.0)
-            .andThen(intake.intakeAlgae()));
+            .andThen(() -> driveSpeedLimiter = 1.0));
+            //.andThen(intake.intakeAlgae()));
         operator.b().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.PROCESSOR));
         operator.x().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L1));
         operator.y().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.L2));

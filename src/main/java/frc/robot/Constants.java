@@ -61,10 +61,10 @@ public class Constants {
 
     public static final class Intake {
         public static enum IntakeMode {
-            INTAKE(6.0),
-            HOLD(1.0),
+            INTAKE(-12),
+            HOLD(-1.25),
             OFF(0.0),
-            SHOOT(-6.0);
+            SHOOT(6.0);
 
             public final double value;
 
@@ -76,11 +76,11 @@ public class Constants {
 
         public static final int INTAKETOP_MOTOR_ID = 24;
         public static final boolean INTAKETOP_MOTOR_INVERTED = true;
-        public static final int INTAKETOP_CURRENT_LIMIT = 25;
+        public static final int INTAKETOP_CURRENT_LIMIT = 8;
 
         public static final int INTAKEBOTTOM_MOTOR_ID = 30;
         public static final boolean INTAKEBOTTOM_MOTOR_INVERTED = true;
-        public static final int INTAKEBOTTOM_CURRENT_LIMIT = 25;
+        public static final int INTAKEBOTTOM_CURRENT_LIMIT = 20;
     }
 
     public static final class Climber {
@@ -91,7 +91,7 @@ public class Constants {
         public static final double MIN_POSITION_METERS = 0.0;
         public static final double MAX_POSITION_METERS = 1.0; // TODO
 
-        public static final double GEARING = 64.0;
+        public static final double GEARING = 25.0;
         public static final double MASS_KG = Units.lbsToKilograms(80); // robot weight
         public static final double SPOOL_RADIUS_METERS = Units.inchesToMeters(0.5);
         public static final double SPOOL_CIRCUMFERENCE = 2.0 * Math.PI * SPOOL_RADIUS_METERS;

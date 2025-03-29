@@ -39,18 +39,18 @@ public class Intake extends SubsystemBase implements BaseIntake {
     private boolean rollersAllowed = false;
 
     public Intake() {
-        config.closedLoop
+        /* config.closedLoop
             .p(0.05)
             .i(0)
             .d(0)
             .outputRange(-1, 1)
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder); */
         intakeTop_motor = createMotor(INTAKETOP_MOTOR_INVERTED, 40, INTAKETOP_MOTOR_ID);
-        intakeBottom_motor = createflex(INTAKEBOTTOM_MOTOR_INVERTED, 40, INTAKEBOTTOM_MOTOR_ID);
+        intakeBottom_motor = createflex(INTAKEBOTTOM_MOTOR_INVERTED, 45, INTAKEBOTTOM_MOTOR_ID);
     }
 
     private void setIntakeVoltage(double voltage) {
-        intakeTop_motor.setVoltage(voltage);
+        intakeTop_motor.setVoltage(voltage * 2);
         intakeBottom_motor.setVoltage(voltage);
     }
 
@@ -65,7 +65,7 @@ public class Intake extends SubsystemBase implements BaseIntake {
         return Commands.startEnd(
                 () -> setIntakeVoltage(IntakeMode.INTAKE.value),
                 () -> setIntakeVoltage(IntakeMode.HOLD.value))
-                .until(() -> intakeTop_motor.getOutputCurrent() > INTAKE_CURRENT_SHUTOFF)
+                //.until(() -> intakeTop_motor.getOutputCurrent() > INTAKE_CURRENT_SHUTOFF)
                 .withName("intake.intakeAlgae");
     }
 

@@ -152,6 +152,10 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         initialized = true;
     }
 
+    public double retEncoder() {
+        return motor.getEncoder().getPosition();
+    }
+
     @Override
     public void setVoltage(double voltage) {
         voltage = MathUtil.clamp(voltage, -12, 12);
@@ -184,6 +188,9 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                         .until(() -> pidController.atGoal()))
                 .withTimeout(7)
                 .withName("elevator.moveToPosition");
+                
+
+                
     }
 
     @Override

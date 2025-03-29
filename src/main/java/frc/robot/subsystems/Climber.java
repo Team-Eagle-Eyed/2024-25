@@ -58,7 +58,7 @@ public class Climber extends SubsystemBase {
 
     public Command winchUpCommand() {
         return Commands.startEnd(
-                () -> setVoltage(12),
+                () -> setVoltage(15),
                 () -> setVoltage(0))
                 .withName("climber.winchUp");
     }
