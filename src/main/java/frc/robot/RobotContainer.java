@@ -89,8 +89,9 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
         joystick.rightTrigger().whileTrue(intake.intakeAlgae());
         joystick.leftTrigger().whileTrue(intake.shootAlgae());
-       // joystick.leftBumper().toggleOnTrue(Commands.startEnd(driveSpeedLimiter = 0.2, () driveSpeedLimiter = 1.0));
+        joystick.leftBumper().whileTrue(Commands.startEnd( () -> driveSpeedLimiter = 0.2, () -> driveSpeedLimiter = 1.0));
         joystick.pov(0).whileTrue(climber.winchDownCommand());
+        joystick.pov(180).whileTrue(climber.winchUpCommand());
         joystick.x().and(joystick.a()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         operator.a().onTrue(elevator.moveToPositionCommand(() -> ElevatorPosition.BOTTOM)
