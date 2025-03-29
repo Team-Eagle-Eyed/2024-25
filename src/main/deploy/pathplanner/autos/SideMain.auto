@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Part2Auto"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "autointake"
