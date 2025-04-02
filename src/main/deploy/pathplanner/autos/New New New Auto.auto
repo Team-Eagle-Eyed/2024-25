@@ -5,15 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "autoelevatorL2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "lowballsetup"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoelevatorL2"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "lowballsetup"
+                }
+              }
+            ]
           }
         },
         {
