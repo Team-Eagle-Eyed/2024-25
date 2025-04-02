@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "lowballsetup"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "autoelevatorL2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "lowballsetup"
           }
         },
         {
@@ -29,7 +29,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 3.0
+                  "waitTime": 1.0
                 }
               }
             ]
