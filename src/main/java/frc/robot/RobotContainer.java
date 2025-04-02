@@ -75,9 +75,9 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed  * driveSpeedLimiter) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * driveSpeedLimiter) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-Math.pow(joystick.getLeftY(), 2) * MaxSpeed  * driveSpeedLimiter) // Drive forward with negative Y (forward)
+                    .withVelocityY(Math.pow(joystick.getLeftX(),2) * MaxSpeed * driveSpeedLimiter) // Drive left with negative X (left)
+                    .withRotationalRate(-Math.pow(joystick.getRightX(), 2) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
