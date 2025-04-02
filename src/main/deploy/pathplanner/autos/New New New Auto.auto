@@ -9,15 +9,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "autoelevatorL2"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
                   "pathName": "lowballsetup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoelevatorL2"
                 }
               }
             ]
