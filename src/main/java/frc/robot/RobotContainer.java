@@ -62,8 +62,8 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
     public RobotContainer() {
 
         NamedCommands.registerCommand("autointake", intake.intakeAlgae());
-        NamedCommands.registerCommand("autoelevator", (elevator.moveToPositionCommand(() -> ElevatorPosition.L1)));
-
+        NamedCommands.registerCommand("autoelevatorL2", (elevator.moveToPositionCommand(() -> ElevatorPosition.L2)));
+        NamedCommands.registerCommand("autoelevatorL3", (elevator.moveToPositionCommand(() -> ElevatorPosition.L3)));
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
         configureBindings();
