@@ -14,6 +14,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,18 +36,22 @@ public class RobotContainer {
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
     public double driveSpeedLimiter = 1.0d;
 
+    // Slew Rate Limiters to limit acceleration of joystick inputs
+    private final SlewRateLimiter xLimiter = new SlewRateLimiter(4);
+    private final SlewRateLimiter yLimiter = new SlewRateLimiter(4);
+
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-// Brian-disabled logging so that it did not fill up storage 3/2/25    
-private final Telemetry logger = new Telemetry(MaxSpeed);
-//SignalLogger.stop(); // Can this even go here?
+    // Brian-disabled logging so that it did not fill up storage 3/2/25    
+    private final Telemetry logger = new Telemetry(MaxSpeed);
+    //SignalLogger.stop(); // Can this even go here?
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController operator = new CommandXboxController(1);
 
@@ -74,12 +79,7 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed  * driveSpeedLimiter) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * driveSpeedLimiter) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
+            drivetrain.applyRequest(() -> getTeleopRequest())
         );
 
         // Run SysId routines when holding back/start and X/Y.
@@ -88,7 +88,7 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
         joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        joystick.rightTrigger().whileTrue(intake.intakeAlgae());
+        joystick.leftBumper().whileTrue(intake.intakeAlgae());
         joystick.leftTrigger().whileTrue(intake.shootAlgae());
         //joystick.leftBumper().toggleOnTrue(Commands.startEnd(() -> driveSpeedLimiter = 0.2, () -> driveSpeedLimiter = 1.0));
         joystick.pov(0).whileTrue(climber.winchDownCommand());
@@ -114,5 +114,21 @@ private final Telemetry logger = new Telemetry(MaxSpeed);
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
+    }
+
+    private SwerveRequest getTeleopRequest() {
+        if (false) {
+            return drive.withVelocityX(xLimiter.calculate(-joystick.getLeftY()) * MaxSpeed  * driveSpeedLimiter) // Drive forward with negative Y (forward)
+                        .withVelocityY(yLimiter.calculate(-joystick.getLeftX()) * MaxSpeed * driveSpeedLimiter) // Drive left with negative X (left)
+                        .withRotationalRate(-joystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+        } else {
+            double stickX = -joystick.getLeftX();
+            double stickY = -joystick.getLeftY();
+            double angle = Math.atan2(stickX, stickY);
+            // Use angle of the left stick and magnitude of the right trigger.  Often called gas pedal control.
+            return drive.withVelocityX(Math.cos(angle) * xLimiter.calculate(joystick.getRightTriggerAxis()) * MaxSpeed  * driveSpeedLimiter)
+                        .withVelocityY(Math.sin(angle) * xLimiter.calculate(joystick.getRightTriggerAxis()) * MaxSpeed  * driveSpeedLimiter)
+                        .withRotationalRate(-joystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+        }
     }
 }
