@@ -70,6 +70,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("autoelevatorL2", (elevator.moveToPositionCommand(() -> ElevatorPosition.L2)));
         NamedCommands.registerCommand("autoelevatorL3", (elevator.moveToPositionCommand(() -> ElevatorPosition.L3)));
         NamedCommands.registerCommand("autobarge", (elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE)));
+        NamedCommands.registerCommand("autooutake", intake.shootAlgae());
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
         configureBindings();
