@@ -14,7 +14,7 @@ public class Constants {
             L2(0.8),
             L3(1.2 ),
             L4(1.4),
-            ALGAE(2.35);
+            ALGAE(2.3);
 
             public final double value;
 
