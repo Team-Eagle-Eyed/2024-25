@@ -114,7 +114,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                         this));
 
         setDefaultCommand(moveToCurrentGoalCommand());
-        pidController.setTolerance(0.150);
+        pidController.setTolerance(0.150
+        );
     }
 
     @Override
