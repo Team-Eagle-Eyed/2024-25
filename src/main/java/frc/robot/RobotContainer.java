@@ -126,11 +126,18 @@ public class RobotContainer {
         } else {
             double stickX = -joystick.getLeftX();
             double stickY = -joystick.getLeftY();
-            double angle = Math.atan2(stickX, stickY);
-            // Use angle of the left stick and magnitude of the right trigger.  Often called gas pedal control.
-            return drive.withVelocityX(Math.cos(angle) * xLimiter.calculate(joystick.getRightTriggerAxis()) * MaxSpeed  * driveSpeedLimiter)
-                        .withVelocityY(Math.sin(angle) * xLimiter.calculate(joystick.getRightTriggerAxis()) * MaxSpeed  * driveSpeedLimiter)
-                        .withRotationalRate(-joystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+            if (Math.abs(Math.hypot(stickX, stickY)) > 0.1) {
+                double angle = Math.atan2(stickX, stickY);
+                // Use angle of the left stick and magnitude of the right trigger.  Often called gas pedal control.
+                return drive.withVelocityX(Math.cos(angle) * xLimiter.calculate(joystick.getRightTriggerAxis()) * MaxSpeed  * driveSpeedLimiter)
+                            .withVelocityY(Math.sin(angle) * xLimiter.calculate(joystick.getRightTriggerAxis()) * MaxSpeed  * driveSpeedLimiter)
+                            .withRotationalRate(-joystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+            } else {
+                // Don't allow movement as the driver hasn't given a direction yet.
+                return drive.withVelocityX(0)
+                            .withVelocityY(0)
+                            .withRotationalRate(0);
+            }
         }
     }
 }
