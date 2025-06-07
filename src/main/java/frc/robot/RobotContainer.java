@@ -83,7 +83,7 @@ public class RobotContainer {
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> getTeleopRequest())
         );
-
+        
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
         joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
@@ -118,8 +118,8 @@ public class RobotContainer {
         return autoChooser.getSelected();
     }
 
-    private SwerveRequest getTeleopRequest() {
-        if (false) {
+     private SwerveRequest getTeleopRequest() {
+        if (true) {
             return drive.withVelocityX(xLimiter.calculate(-joystick.getLeftY()) * MaxSpeed  * driveSpeedLimiter) // Drive forward with negative Y (forward)
                         .withVelocityY(yLimiter.calculate(-joystick.getLeftX()) * MaxSpeed * driveSpeedLimiter) // Drive left with negative X (left)
                         .withRotationalRate(-joystick.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)

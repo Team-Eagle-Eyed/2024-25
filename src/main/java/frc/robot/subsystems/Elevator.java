@@ -114,7 +114,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                         this));
 
         setDefaultCommand(moveToCurrentGoalCommand());
-        pidController.setTolerance(0.150
+        pidController.setTolerance(0.03
         );
     }
 
@@ -188,7 +188,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                 runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
                 moveToCurrentGoalCommand()
                         .until(() -> pidController.atGoal()))
-                .withTimeout(7)
+                .withTimeout(3)
                 .withName("elevator.moveToPosition");
                 
 

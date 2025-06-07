@@ -10,11 +10,11 @@ public class Constants {
         public static enum ElevatorPosition {
             BOTTOM(0),
             PROCESSOR(0.2),
-            L1(0.5),
+            L1(0.15),
             L2(0.8),
             L3(1.2 ),
             L4(1.4),
-            ALGAE(2.3);
+            ALGAE(2.23);
 
             public final double value;
 
@@ -40,7 +40,7 @@ public class Constants {
         public static final double MIN_HEIGHT_METERS = 0.0; // done
         public static final double MAX_HEIGHT_METERS = 2.5; //done
 
-        public static final int CURRENT_LIMIT = 35;
+        public static final int CURRENT_LIMIT =20 ;
 
         public static final double kP = 2.5; // TODO
         public static final double kI = 0.; // TODO
